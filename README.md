@@ -1,4 +1,4 @@
-# 🏛️ Exhibitor Data Çekimi Projesi
+# 🏛️ Exhibitor Data Çekimi Projesigit 
 
 > **IFE (International Food & Drink Event)** fuar katılımcı verilerini, ürün kataloglarını, stant numaralarını ve detaylı iletişim/açılış bilgilerini otomatik olarak toplayan, veritabanına işleyen ve yüksek performanslı modern bir arayüzde sunan **Full-Stack Web Portalı**.
 

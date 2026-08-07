@@ -29,8 +29,8 @@ function App() {
     setLoading(true);
     try {
       const [exRes, catRes] = await Promise.allSettled([
-        axios.get('http://127.0.0.1:5000/api/exhibitors'),
-        axios.get('http://127.0.0.1:5000/api/categories')
+        axios.get('/api/exhibitors'),
+        axios.get('/api/categories')
       ]);
 
       if (exRes.status === 'fulfilled' && exRes.value.data.success) {
@@ -58,7 +58,7 @@ function App() {
   const handleScrape = async () => {
     setScraping(true);
     try {
-      const res = await axios.get('http://127.0.0.1:5000/api/scrape');
+      const res = await axios.get('/api/scrape');
       if (res.data.success) {
         alert(`Tüm Sayfalar Taranıp Güncellendi! Toplam: ${res.data.data.totalScraped}`);
         fetchData();
@@ -206,7 +206,7 @@ function App() {
                   <div className="card-logo-box">
                     {item.local_logo_path || item.logo_url ? (
                       <img
-                        src={item.local_logo_path ? `http://127.0.0.1:5000${item.local_logo_path}` : item.logo_url}
+                        src={item.local_logo_path ? `/${item.local_logo_path}` : item.logo_url}
                         alt={item.name}
                         onError={(e) => { e.target.style.display = 'none'; }}
                       />
