@@ -129,6 +129,19 @@ app.get('/api/categories', async (req, res) => {
   }
 });
 
+// Scraper'ı import et
+const { scrapeSialExhibitors } = require('./sialScraper');
+
+// Yeni API Endpoint'i
+app.post('/api/scrape/sial', async (req, res) => {
+  try {
+    res.json({ message: 'SIAL Paris 2026 tarama işlemi arka planda başlatıldı!' });
+    scrapeSialExhibitors(2026).catch(err => console.error("SIAL Scrape Error:", err));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Sunucu http://localhost:${PORT} adresinde çalışıyor`);
 });

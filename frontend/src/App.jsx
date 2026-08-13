@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import ExhibitorModal from './components/ExhibitorModal';
 import './App.css';
+import * as XLSX from 'xlsx';
+import { Download } from 'lucide-react';
 
 function App() {
   const [exhibitors, setExhibitors] = useState([]);
@@ -29,8 +31,8 @@ function App() {
     setLoading(true);
     try {
       const [exRes, catRes] = await Promise.allSettled([
-        axios.get('/api/exhibitors'),
-        axios.get('/api/categories')
+        axios.get('http://localhost:5000/api/exhibitors'),
+        axios.get('http://localhost:5000/api/categories')
       ]);
 
       if (exRes.status === 'fulfilled' && exRes.value.data.success) {
@@ -58,7 +60,7 @@ function App() {
   const handleScrape = async () => {
     setScraping(true);
     try {
-      const res = await axios.get('/api/scrape');
+      const res = await axios.get('http://localhost:5000/api/scrape');
       if (res.data.success) {
         alert(`Tüm Sayfalar Taranıp Güncellendi! Toplam: ${res.data.data.totalScraped}`);
         fetchData();
@@ -99,6 +101,42 @@ function App() {
     return filteredExhibitors.slice(start, start + itemsPerPage);
   }, [filteredExhibitors, currentPage, itemsPerPage]);
 
+
+  const handleExportExcel = () => {
+  if (!filteredExhibitors || filteredExhibitors.length === 0) {
+    alert('İndirilecek veri bulunamadı.');
+    return;
+  }
+
+  // Excel kolonlarını düzenle
+  const exportData = filteredExhibitors.map((item, index) => ({
+      'Sıra No': index + 1,
+      'Firma Adı': item.name || '',
+      'Stant No': item.stand_number || '',
+      'Kategori / Sektör': item.category || '',
+      'Fuar Tarihi': item.event_dates || item.year || '',
+      'Açıklama': item.full_details || item.description || '',
+      'Web Sitesi': item.website || '',
+      'Telefon': item.contact_phone || '',
+      'E-Posta': item.contact_email || '',
+      'Adres': item.address || '',
+      'Organizatör': item.organiser || ''
+    }));
+
+    // Worksheet ve Workbook oluştur
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Katılımcı Listesi');
+
+    // Kolon genişliklerini otomatik ayarla
+    const max_width = exportData.reduce((w, r) => Math.max(w, r['Firma Adı'].length), 10);
+    worksheet['!cols'] = [{ wch: 8 }, { wch: Math.min(max_width + 5, 40) }, { wch: 15 }, { wch: 25 }, { wch: 18 }];
+
+    // Dosyayı indir
+    const fileName = `e-fuar_katilimci_listesi_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
+  };
+
   return (
     <div className="app-container">
       {/* HERO BANNER & HEADER */}
@@ -107,6 +145,10 @@ function App() {
           <h1><Building2 size={32} />Exhibitor Listesi Global</h1>
           <p>Uluslararası Fuar Katılımcı Verileri, Ürün Kataloğu ve İletişim Portalı</p>
         </div>
+        <button className="scrape-action-btn" onClick={handleExportExcel} style={{ background: '#059669' }}>
+          <Download size={18} />
+          Excel'e Aktar ({filteredExhibitors.length})
+        </button>
 
         <button className="scrape-action-btn" onClick={handleScrape} disabled={scraping}>
           <RefreshCw size={18} className={scraping ? 'spin' : ''} />
@@ -137,6 +179,7 @@ function App() {
             <strong>{filteredExhibitors.length} Sonuç</strong>
           </div>
         </div>
+        
       </div>
 
       {/* ARAMA VE FİLTRE BARI */}
@@ -171,6 +214,7 @@ function App() {
             <option value="date-asc">Tarih (Eskiden Yeniye)</option>
             <option value="date-desc">Tarih (Yeniden Eskiye)</option>
           </select>
+
         </div>
       </div>
 
@@ -206,7 +250,7 @@ function App() {
                   <div className="card-logo-box">
                     {item.local_logo_path || item.logo_url ? (
                       <img
-                        src={item.local_logo_path ? `/${item.local_logo_path}` : item.logo_url}
+                        src={item.local_logo_path ? `http://localhost:5000${item.local_logo_path}` : item.logo_url}
                         alt={item.name}
                         onError={(e) => { e.target.style.display = 'none'; }}
                       />
