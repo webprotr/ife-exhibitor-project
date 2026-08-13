@@ -14,7 +14,7 @@ function ExhibitorModal({ exhibitorId, onClose }) {
     const fetchDetails = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`http://127.0.0.1:5000/api/exhibitors/${exhibitorId}`);
+        const response = await axios.get(`/api/exhibitors/${exhibitorId}`);
         if (response.data.success) {
           setData(response.data.data);
         }
@@ -52,7 +52,7 @@ function ExhibitorModal({ exhibitorId, onClose }) {
               <div className="modal-header-logo">
                 {data.local_logo_path || data.logo_url ? (
                   <img
-                    src={data.local_logo_path ? `http://127.0.0.1:5000${data.local_logo_path}` : data.logo_url}
+                    src={data.local_logo_path ? `${data.local_logo_path}` : data.logo_url}
                     alt={data.name}
                     onError={(e) => { e.target.style.display = 'none'; }}
                   />
@@ -102,7 +102,7 @@ function ExhibitorModal({ exhibitorId, onClose }) {
                       <div key={prod.id} className="product-card-item">
                         {prod.image_url && (
                           <img
-                            src={prod.local_image_path ? `http://127.0.0.1:5000${prod.local_image_path}` : prod.image_url}
+                            src={prod.local_image_path ? `${prod.local_image_path}` : prod.image_url}
                             alt={prod.name}
                             onError={(e) => { e.target.style.display = 'none'; }}
                           />
